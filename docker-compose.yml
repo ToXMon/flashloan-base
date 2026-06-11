@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  rust-sidecar:
+    build:
+      context: ./rust-sidecar
+      dockerfile: Dockerfile
+    container_name: flashloan-rust-sidecar
+    restart: unless-stopped
+    ports:
+      - "50051:50051"
+    env_file:
+      - .env
+    environment:
+      - RUST_LOG=info
+      - GRPC_BIND=0.0.0.0:50051
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - flashloan-net
+    # Volume mount source for development rebuilds
+    volumes:
+      - ./rust-sidecar/src:/app/src:ro
+
+  typescript-core:
+    build:
+      context: .
+      dockerfile: Dockerfile.ts
+    container_name: flashloan-typescript-core
+    restart: unless-stopped
+    depends_on:
+      rust-sidecar:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - GRPC_SIDECAR_ADDR=rust-sidecar:50051
+    networks:
+      - flashloan-net
+    # Volume mounts for development
+    volumes:
+      - ./src:/app/src:ro
+      - ./contracts:/app/contracts:ro
+      - ./scripts:/app/scripts:ro
+
+networks:
+  flashloan-net:
+    driver: bridge

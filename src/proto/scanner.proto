@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package flashloan.scanner.v1;
+
+import "common.proto";
+
+// Single hop in an arbitrage route
+message RouteHop {
+  string pool_address = 1;
+  Dex dex = 2;
+  string token_in = 3;
+  string token_out = 4;
+  int32 fee_bps = 5;
+  string expected_output = 6;
+}
+
+// Arbitrage opportunity detected by the scanner
+message OpportunitySignal {
+  string signal_id = 1;
+  Strategy strategy = 2;
+  int64 timestamp = 3;
+  float confidence = 4;
+  string expected_profit_usd = 5;
+  int32 expected_profit_bps = 6;
+  repeated RouteHop route = 7;
+  string input_token = 8;
+  string input_amount = 9;
+  string estimated_gas_cost_usd = 10;
+  string net_profit_usd = 11;
+  int64 expires_at = 12;
+}
+
+// Real-time price update from a DEX pool
+message PoolPriceUpdate {
+  string pool_address = 1;
+  Dex dex = 2;
+  string token_a = 3;
+  string token_b = 4;
+  string price_a_to_b = 5;
+  string price_b_to_a = 6;
+  int64 timestamp = 7;
+  string liquidity = 8;
+}
+
+// Health check response from the scanner service
+message HealthCheck {
+  HealthStatus status = 1;
+  int64 uptime_seconds = 2;
+  int32 active_feeds = 3;
+  int64 signals_emitted = 4;
+  int64 last_signal_at = 5;
+}
+
+// Result of executing an arbitrage opportunity
+message ExecutionResult {
+  string signal_id = 1;
+  bool success = 2;
+  string actual_profit_usd = 3;
+  string tx_hash = 4;
+  string error_message = 5;
+  int64 execution_time_ms = 6;
+}
+
+// gRPC service for the flash loan scanner
+service ScannerService {
+  // Stream detected arbitrage opportunities
+  rpc StreamOpportunities(StreamRequest) returns (stream OpportunitySignal);
+
+  // Stream real-time pool price updates
+  rpc StreamPrices(StreamRequest) returns (stream PoolPriceUpdate);
+
+  // Get scanner health status
+  rpc GetHealth(Empty) returns (HealthCheck);
+
+  // Report execution result back to scanner
+  rpc ReportExecution(ExecutionResult) returns (Empty);
+}

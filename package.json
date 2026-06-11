@@ -1,0 +1,41 @@
+{
+  "name": "flashloan-base-leverage",
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "deploy": "hardhat run scripts/deploy.ts --network base",
+    "deploy:v2": "hardhat run scripts/deploy-v2.ts --network base",
+    "deploy:sepolia": "hardhat run scripts/deploy-v2.ts --network baseSepolia",
+    "test": "hardhat test --network hardhatBase",
+    "verify": "hardhat verify --network base",
+    "compile": "hardhat compile",
+    "scan": "npx tsx src/scanner/opportunity-scanner.ts",
+    "scan:watch": "npx tsx src/scanner/opportunity-scanner.ts watch",
+    "arb": "npx tsx src/scanner/arb-engine.ts",
+    "memecoins": "npx tsx src/scanner/memecoin-hunter.ts",
+    "memecoin:analyze": "npx tsx src/scanner/memecoin-hunter.ts analyze",
+    "dashboard": "npx tsx src/scanner/dashboard.ts",
+    "dashboard:monitor": "npx tsx src/scanner/dashboard.ts monitor"
+  },
+  "devDependencies": {
+    "@aave/core-v3": "^1.19.3",
+    "@balancer-labs/v2-interfaces": "^0.4.0",
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
+    "@nomicfoundation/hardhat-mocha": "^3.0.21",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "chai": "^6.2.2",
+    "dotenv": "^16.4.0",
+    "ethers": "^6.15.0",
+    "hardhat": "^3.9.0",
+    "mocha": "^11.7.6",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.8.0"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
+    "@nomicfoundation/hardhat-verify": "^3.0.20"
+  }
+}

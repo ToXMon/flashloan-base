@@ -1,0 +1,39 @@
+# ── Git ─────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Node ────────────────────────────────────────────────────────
+node_modules
+npm-debug.log*
+
+# ── Rust build artifacts ────────────────────────────────────────
+rust-sidecar/target
+
+# ── Hardhat ─────────────────────────────────────────────────────
+artifacts
+cache
+typechain-types
+
+# ── Secrets (never include) ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE / OS ────────────────────────────────────────────────────
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Docker ──────────────────────────────────────────────────────
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# ── Docs / Misc ─────────────────────────────────────────────────
+docs
+*.md
+!README.md
+.a0proj
