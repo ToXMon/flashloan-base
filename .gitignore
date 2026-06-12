@@ -1,7 +1,6 @@
 # Node
 node_modules/
 .env
-rust-sidecar/target/
 *.log
 .DS_Store
 
