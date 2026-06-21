@@ -42,11 +42,8 @@ check-wallet.ts
 ALPHA_REPORT_*.md
 LIVE_ALPHA_REPORT_*.md
 
-# Rust build output — only the committed binary is kept
+# Rust build output — only the committed binary is included
 rust-sidecar/target/*
 !rust-sidecar/target/debug/
 rust-sidecar/target/debug/*
 !rust-sidecar/target/debug/flashloan-sidecar
-!rust-sidecar/target/release/
-rust-sidecar/target/release/*
-!rust-sidecar/target/release/flashloan-sidecar
