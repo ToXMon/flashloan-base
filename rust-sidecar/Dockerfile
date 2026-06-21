@@ -1,5 +1,5 @@
 # Single-stage Dockerfile using pre-compiled Rust binary
-# Binary is committed to git at rust-sidecar/target/debug/flashloan-sidecar
+# Binary is committed to git at rust-sidecar/target/release/flashloan-sidecar
 
 FROM debian:bookworm-slim
 
@@ -14,7 +14,7 @@ RUN groupadd --gid 1000 appuser && \
 
 WORKDIR /app
 
-COPY rust-sidecar/target/debug/flashloan-sidecar /app/flashloan-sidecar
+COPY rust-sidecar/target/release/flashloan-sidecar /app/flashloan-sidecar
 COPY rust-sidecar/config /app/config
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.28 && \

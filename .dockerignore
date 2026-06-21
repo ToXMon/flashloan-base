@@ -46,4 +46,4 @@ LIVE_ALPHA_REPORT_*.md
 rust-sidecar/target/*
 !rust-sidecar/target/debug/
 rust-sidecar/target/debug/*
-!rust-sidecar/target/debug/flashloan-sidecar
+!rust-sidecar/target/release/flashloan-sidecar

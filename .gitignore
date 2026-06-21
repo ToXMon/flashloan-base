@@ -25,9 +25,9 @@ LIVE_ALPHA_REPORT_*.md
 
 # Rust build output (only committed binary is intentional)
 rust-sidecar/target/*
-!rust-sidecar/target/debug/
-rust-sidecar/target/debug/*
-!rust-sidecar/target/debug/flashloan-sidecar
+!rust-sidecar/target/release/
+rust-sidecar/target/release/*
+!rust-sidecar/target/release/flashloan-sidecar
 
 # no-mistakes generated agent files
 .agents/
