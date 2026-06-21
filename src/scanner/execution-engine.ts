@@ -15,6 +15,33 @@ import type { RiskManager } from './risk-manager.js';
 import type { OpportunitySignal } from './grpc-client.js';
 import { Strategy, Dex } from './grpc-client.js';
 
+// ─── Directional Trading ────────────────────────────────────────────
+
+export interface DirectionalTrade {
+  side: 'long' | 'short';
+  entry_price: number;
+  stop_loss: number;
+  take_profit: number;
+  size_usd: number;
+  leverage: number;
+  regime: string;
+  confidence: number;
+  signal_id: string;
+  token: string;
+}
+
+export interface DirectionalExecutionConfig {
+  dexRouter: string;
+  defaultSlippageBps: number;
+  deadlineSeconds: number;
+}
+
+export const DEFAULT_DIRECTIONAL_EXECUTION_CONFIG: DirectionalExecutionConfig = {
+  dexRouter: '0xAAA45c2E1E6b3bB96E97fA3Ea0fB76cB4E8A1a2D',
+  defaultSlippageBps: 50,
+  deadlineSeconds: 60,
+};
+
 // ─── Configuration ──────────────────────────────────────────────────
 
 export interface ExecutionConfig {
@@ -465,6 +492,68 @@ export class ExecutionEngine {
     this.contract = null;
     this._initialized = false;
     console.log('[ExecutionEngine] Shutdown complete');
+  }
+
+  // ── Directional Execution ────────────────────────────────────
+
+  /**
+   * Execute a directional (long/short) trade through a DEX swap.
+   * Validates against risk manager, simulates the swap, and computes profit.
+   */
+  async executeDirectional(trade: DirectionalTrade): Promise<TradeResult> {
+    const startTime = Date.now();
+
+    if (!this._initialized) {
+      return this.fail(trade.signal_id, startTime, 'Engine not initialized — call init() first');
+    }
+
+    // Risk validation
+    const validation = (this.riskManager as any).validateDirectionalTrade(
+      trade.side,
+      trade.regime,
+      trade.confidence,
+    );
+    if (!validation?.approved) {
+      const reason = validation?.reasons?.join('; ') ?? 'Directional trade rejected by risk manager';
+      console.warn(`[ExecutionEngine] Directional trade ${trade.signal_id} rejected: ${reason}`);
+      return this.fail(trade.signal_id, startTime, reason);
+    }
+
+    try {
+      // Simulate DEX swap — compute estimated output after slippage
+      const slippageBps = DEFAULT_DIRECTIONAL_EXECUTION_CONFIG.defaultSlippageBps;
+      const estimatedOutput = trade.size_usd * (1 - slippageBps / 10000);
+
+      // Gas cost estimate for Base (~200k gas at 0.001 gwei = 0.0002 ETH ≈ $0.50)
+      const gasUnits = 200000;
+      const gasPriceGwei = 0.001;
+      const gasCostEth = (gasUnits * gasPriceGwei) / 1e9;
+      const gasCostUsd = gasCostEth * 2500; // ~$2500/ETH
+
+      // Compute profit based on trade direction
+      let profitUsd: number;
+      if (trade.side === 'long') {
+        profitUsd = ((trade.take_profit - trade.entry_price) / trade.entry_price)
+          * trade.size_usd * trade.leverage;
+      } else {
+        profitUsd = ((trade.entry_price - trade.take_profit) / trade.entry_price)
+          * trade.size_usd * trade.leverage;
+      }
+
+      const netProfit = profitUsd - gasCostUsd;
+
+      return {
+        success: true,
+        signal_id: trade.signal_id,
+        profit_usd: Math.max(netProfit, 0),
+        gas_cost_usd: gasCostUsd,
+        execution_time_ms: Date.now() - startTime,
+      };
+    } catch (err) {
+      const errorMsg = this.decodeError(err);
+      console.error(`[ExecutionEngine] Directional trade ${trade.signal_id} failed: ${errorMsg}`);
+      return this.fail(trade.signal_id, startTime, errorMsg);
+    }
   }
 
   // ── Internal Helpers ──────────────────────────────────────────

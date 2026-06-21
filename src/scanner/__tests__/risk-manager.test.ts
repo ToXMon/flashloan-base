@@ -560,3 +560,35 @@ void describe('RiskManager — Edge Cases', () => {
     assert.equal(stats.winRate, 0);
   });
 });
+ 
+ // ─── Directional Risk Config / validateDirectionalTrade ──────────────
+ 
+ void describe('validateDirectionalTrade', () => {
+   void it('approves valid directional trade', () => {
+     const rm = new RiskManager();
+     const result = rm.validateDirectionalTrade('long', 'bullish', 0.5);
+     assert.equal(result.approved, true);
+   });
+ 
+   void it('rejects when regime mismatch (bearish + long)', () => {
+     const rm = new RiskManager();
+     const result = rm.validateDirectionalTrade('long', 'bearish', 0.5);
+     assert.equal(result.approved, false);
+     assert.ok(
+       result.reasons.some((r: string) =>
+         r.toLowerCase().includes('regime'),
+       ),
+     );
+   });
+ 
+   void it('rejects when confidence too low', () => {
+     const rm = new RiskManager();
+     const result = rm.validateDirectionalTrade('long', 'bullish', 0.1);
+     assert.equal(result.approved, false);
+     assert.ok(
+       result.reasons.some((r: string) =>
+         r.toLowerCase().includes('confidence'),
+       ),
+     );
+   });
+ });

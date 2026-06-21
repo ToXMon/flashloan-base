@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package flashloan.scanner.v1;
+
+import "common.proto";
+
+// ── Existing Messages ────────────────────────────────────────────────
+
+// Single hop in an arbitrage route
+message RouteHop {
+  string pool_address = 1;
+  Dex dex = 2;
+  string token_in = 3;
+  string token_out = 4;
+  int32 fee_bps = 5;
+  string expected_output = 6;
+}
+
+// Arbitrage opportunity detected by the scanner
+message OpportunitySignal {
+  string signal_id = 1;
+  Strategy strategy = 2;
+  int64 timestamp = 3;
+  float confidence = 4;
+  string expected_profit_usd = 5;
+  int32 expected_profit_bps = 6;
+  repeated RouteHop route = 7;
+  string input_token = 8;
+  string input_amount = 9;
+  string estimated_gas_cost_usd = 10;
+  string net_profit_usd = 11;
+  int64 expires_at = 12;
+}
+
+// Real-time price update from a DEX pool
+message PoolPriceUpdate {
+  string pool_address = 1;
+  Dex dex = 2;
+  string token_a = 3;
+  string token_b = 4;
+  string price_a_to_b = 5;
+  string price_b_to_a = 6;
+  int64 timestamp = 7;
+  string liquidity = 8;
+}
+
+// Health check response from the scanner service
+message HealthCheck {
+  HealthStatus status = 1;
+  int64 uptime_seconds = 2;
+  int32 active_feeds = 3;
+  int64 signals_emitted = 4;
+  int64 last_signal_at = 5;
+}
+
+// Result of executing an arbitrage opportunity
+message ExecutionResult {
+  string signal_id = 1;
+  bool success = 2;
+  string actual_profit_usd = 3;
+  string tx_hash = 4;
+  string error_message = 5;
+  int64 execution_time_ms = 6;
+}
+
+// ── New: Directional Trading Messages ─────────────────────────────────
+
+// Directional trading signal for regime-aware trend following
+message DirectionalSignal {
+  string signal_id = 1;
+  string pair = 2;  // e.g. "WETH/USDC"
+  Direction direction = 3;
+  string entry_price = 4;       // USD decimal string
+  string stop_loss = 5;         // USD decimal string (1.5x ATR)
+  string take_profit = 6;       // USD decimal string (3x ATR)
+  double confidence = 7;        // 0.0 - 1.0
+  string regime_at_signal = 8;  // Regime enum name at time of generation
+  double regime_confidence = 9;
+  int64 expires_at = 10;        // Block number (signal expires if not executed by this block)
+  string atr = 11;              // ATR value at signal time
+  string sma_fast = 12;         // SMA(20) value
+  string sma_slow = 13;         // SMA(50) value
+  int64 generated_at_ms = 14;
+}
+
+// Market regime update event
+message RegimeUpdate {
+  string regime = 1;
+  string previous_regime = 2;
+  double confidence = 3;
+  int64 changed_at_block = 4;
+  repeated string pairs_affected = 5;
+  int64 detected_at_ms = 6;
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────
+
+// Direction for directional trading signals
+enum Direction {
+  DIRECTION_UNSPECIFIED = 0;
+  LONG = 1;
+  SHORT = 2;  // Reserved for Phase 2
+}
+
+// ── Unified Response ──────────────────────────────────────────────────
+
+// Wrapper message that can carry any scanner output
+message ScannerResponse {
+  oneof payload {
+    OpportunitySignal opportunity = 1;
+    DirectionalSignal directional_signal = 2;
+    RegimeUpdate regime_update = 3;
+    PoolPriceUpdate price_update = 4;
+    HealthCheck health = 5;
+    ExecutionResult execution = 6;
+  }
+}
+
+// ── gRPC Service ─────────────────────────────────────────────────────
+
+// gRPC service for the flash loan scanner
+service ScannerService {
+  // Stream detected arbitrage opportunities
+  rpc StreamOpportunities(StreamRequest) returns (stream OpportunitySignal);
+
+  // Stream real-time pool price updates
+  rpc StreamPrices(StreamRequest) returns (stream PoolPriceUpdate);
+
+  // Get scanner health status
+  rpc GetHealth(Empty) returns (HealthCheck);
+
+  // Report execution result back to scanner
+  rpc ReportExecution(ExecutionResult) returns (Empty);
+
+  // Stream directional trading signals (regime-gated)
+  rpc StreamDirectionalSignals(StreamRequest) returns (stream DirectionalSignal);
+
+  // Stream market regime updates
+  rpc StreamRegimeUpdates(StreamRequest) returns (stream RegimeUpdate);
+
+  // Get current market regime
+  rpc GetCurrentRegime(Empty) returns (RegimeUpdate);
+
+  // Stream all signals via unified response
+  rpc StreamSignals(StreamRequest) returns (stream ScannerResponse);
+}

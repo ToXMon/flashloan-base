@@ -1,0 +1,130 @@
+# Pool configuration for Base chain DeFi arbitrage scanner.
+#
+# DEX types: aerodrome_cl, aerodrome_amm, uniswap_v3
+# Addresses should be verified on-chain before production use.
+
+[[pools]]
+pool_id = "0xcBa0A2c4979CFbacd48230E25268A672F21B2eF7"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 5
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+fee_bps = 30
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x73feA5C26B3047A2b9681E72C450604D86E4BBfD"
+token_a = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+token_b = "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+fee_bps = 5
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x6eeDb1E03e7B299DA6ACcEBe1c01aF0E935E7E46"
+token_a = "0x50c5725949A6F0c72eF1a5A6F9Bf1d9295EcC1b2"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 5
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0xcF77a3Ba9A5CA399B7c97c74d5e9b1317F78Df14"
+token_a = "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22"
+token_b = "0x4200000000000000000000000000000000000006"
+fee_bps = 30
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x4704Eae5B09B795e00a240e793a558239E42Cc81"
+token_a = "0x04c0599Ae5A44757c0af6F9eC3b93da8976c150A"
+token_b = "0x4200000000000000000000000000000000000006"
+fee_bps = 30
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0xEBD05C84023968794c3BD749698c7e7A5e7107D9"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 30
+dex = "aerodrome_amm"
+
+[[pools]]
+pool_id = "0x2e70726131742a10A7F4CB1B9706B092Aec9BF82"
+token_a = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+token_b = "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+fee_bps = 5
+dex = "aerodrome_amm"
+
+[[pools]]
+pool_id = "0xAB80bBa272C1A9bB1229b6c16D593d16B50E260c"
+token_a = "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22"
+token_b = "0x4200000000000000000000000000000000000006"
+fee_bps = 30
+dex = "aerodrome_amm"
+
+[[pools]]
+pool_id = "0xd0b53D9277642d899DF5C87A3966A349A798F22c"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 5
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0x5e4CD9e0e847b931Ba032424B9a5Bc51a9c78Ffd"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 30
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0x7aC06Cd26da398B1C1a5e245F6C4f88DCa259051"
+token_a = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+token_b = "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+fee_bps = 5
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0x843B6e6FbbB55367B2B0b1bd223B3A8bA637c41B"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22"
+fee_bps = 30
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0xBdfbd54a22080cC5E8379e6E7112B73bAaC8159C"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x50c5725949A6F0c72eF1a5A6F9Bf1d9295EcC1b2"
+fee_bps = 30
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0xdAD5eB046399cF18E65a3b0E1d6f9B1b6d59BbDD"
+token_a = "0x4200000000000000000000000000000000000006"
+token_b = "0x04c0599Ae5A44757c0af6F9eC3b93da8976c150A"
+fee_bps = 30
+dex = "uniswap_v3"
+
+[[pools]]
+pool_id = "0x34d78bDc29DAc81F67e2c7C08D42a1E1976b94c1"
+token_a = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+token_b = "0x50c5725949A6F0c72eF1a5A6F9Bf1d9295EcC1b2"
+fee_bps = 5
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x4a7DFE3e6e9e6E2e03e97D98207C7b41954E4382"
+token_a = "0x50c5725949A6F0c72eF1a5A6F9Bf1d9295EcC1b2"
+token_b = "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+fee_bps = 5
+dex = "aerodrome_cl"
+
+[[pools]]
+pool_id = "0x8966eF3433d62d8a74a7D4F0Ea68478Dd29C1a9E"
+token_a = "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22"
+token_b = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+fee_bps = 30
+dex = "uniswap_v3"

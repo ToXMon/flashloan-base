@@ -15,7 +15,8 @@
     "memecoins": "npx tsx src/scanner/memecoin-hunter.ts",
     "memecoin:analyze": "npx tsx src/scanner/memecoin-hunter.ts analyze",
     "dashboard": "npx tsx src/scanner/dashboard.ts",
-    "dashboard:monitor": "npx tsx src/scanner/dashboard.ts monitor"
+    "dashboard:monitor": "npx tsx src/scanner/dashboard.ts monitor",
+    "paper-trade": "npx tsx src/scanner/paper-trade.ts"
   },
   "devDependencies": {
     "@aave/core-v3": "^1.19.3",

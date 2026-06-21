@@ -28,3 +28,7 @@ rust-sidecar/target/*
 !rust-sidecar/target/debug/
 rust-sidecar/target/debug/*
 !rust-sidecar/target/debug/flashloan-sidecar
+
+# no-mistakes generated agent files
+.agents/
+.claude/

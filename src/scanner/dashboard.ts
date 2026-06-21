@@ -127,6 +127,7 @@ class FlashLoanDashboard {
       this.renderSystemStatus(block, feeData);
       await this.renderPortfolio(portfolio);
       this.renderRiskMetrics(risk);
+      this.renderDirectionalTrading();
       this.renderQuickActions();
     } catch (err) {
       console.log(`  ⚠️  Error: ${(err as Error).message}`);
@@ -283,6 +284,28 @@ class FlashLoanDashboard {
     console.log(`  │ Liquidation Distance: ${risk.liquidationDistance.toFixed(1)}%`);
     console.log(`  │ Concentration: ${risk.concentrationRisk}/100`);
     console.log(`  │ Protocol Risk: ${risk.protocolRisk}/100`);
+    console.log("  └──────────────────────────────────────────────────────────┘");
+  }
+
+  // ───────────────────────────────────────────────────────
+  // Directional Trading
+  // ───────────────────────────────────────────────────────
+
+  private renderDirectionalTrading(): void {
+    console.log("\n  ┌─ DIRECTIONAL TRADING ────────────────────────────────────┐");
+    console.log(`  │ ${C.bold}Directional Trading${C.reset}`);
+    console.log("  │");
+    console.log("  │ ── Active Positions ──");
+    console.log("  │ No active directional positions");
+    console.log("  │");
+    console.log("  │ ── Regime Status ──");
+    console.log(`  │ ${C.yellow}Regime: — (no data)${C.reset}`);
+    console.log("  │ Confidence: 0.00");
+    console.log("  │ Status: IDLE");
+    console.log("  │");
+    console.log("  │ ── Signal Feed ──");
+    console.log(`  │ ${C.dim}Side | Regime | Conf | Size | RR${C.reset}`);
+    console.log(`  │ ${C.dim}— No signals yet —${C.reset}`);
     console.log("  └──────────────────────────────────────────────────────────┘");
   }
 

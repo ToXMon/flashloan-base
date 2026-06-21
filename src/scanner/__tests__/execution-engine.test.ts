@@ -6,7 +6,7 @@
 
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { ExecutionEngine, DEFAULT_EXECUTION_CONFIG } from '../execution-engine.js';
+import { ExecutionEngine, DEFAULT_EXECUTION_CONFIG, DirectionalTrade } from '../execution-engine.js';
 import { RiskManager } from '../risk-manager.js';
 import type { OpportunitySignal } from '../grpc-client.js';
 import { Strategy, Dex } from '../grpc-client.js';
@@ -417,3 +417,57 @@ async function mockInitWithControls(
 
   return { mockContract, mockProvider };
 }
+
+// ─── Directional Execution ────────────────────────────────────────
+
+function makeDirectionalTrade(overrides?: Partial<DirectionalTrade>): DirectionalTrade {
+  return {
+    side: 'long',
+    entry_price: 3000,
+    stop_loss: 2900,
+    take_profit: 3300,
+    size_usd: 100,
+    leverage: 2,
+    regime: 'bullish',
+    confidence: 0.8,
+    signal_id: 'dir-001',
+    token: WETH,
+    ...overrides,
+  };
+}
+
+void describe('ExecutionEngine — executeDirectional', () => {
+  void it('rejects uninitialized engine', async () => {
+    const { engine } = createEngine();
+    const result = await engine.executeDirectional(makeDirectionalTrade());
+    assert.equal(result.success, false);
+    assert.ok(result.error!.includes('not initialized'));
+    assert.equal(result.signal_id, 'dir-001');
+    assert.ok(result.execution_time_ms >= 0);
+  });
+
+  void it('validates through RiskManager', async () => {
+    const { engine } = createEngine();
+    await mockInit(engine);
+
+    const result = await engine.executeDirectional(
+      makeDirectionalTrade({ regime: 'neutral' }),
+    );
+    assert.equal(result.success, false);
+    assert.ok(result.error!.includes('neutral'));
+    assert.equal(result.signal_id, 'dir-001');
+  });
+
+  void it('returns proper TradeResult shape', async () => {
+    const { engine } = createEngine();
+    await mockInit(engine);
+
+    const result = await engine.executeDirectional(makeDirectionalTrade());
+    assert.equal(typeof result.success, 'boolean');
+    assert.equal(typeof result.signal_id, 'string');
+    assert.equal(typeof result.execution_time_ms, 'number');
+    assert.ok(result.execution_time_ms >= 0);
+    assert.equal(typeof result.profit_usd, 'number');
+    assert.equal(typeof result.gas_cost_usd, 'number');
+  });
+});
