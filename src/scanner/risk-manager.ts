@@ -16,6 +16,45 @@ import type { OpportunitySignal } from './grpc-client.js';
 
 // ─── Configuration ──────────────────────────────────────────────────
 
+export interface DirectionalRiskConfig {
+  /** Max position size as % of account (e.g. 20 = 20%) */
+  positionSizePct: number;
+  /** Max leverage for directional trades */
+  maxLeverage: number;
+  /** Stop-loss in basis points from entry */
+  stopLossBps: number;
+  /** Take-profit in basis points from entry */
+  takeProfitBps: number;
+  /** Max drawdown % before auto-shutdown */
+  maxDrawdownPct: number;
+  /** Consecutive directional losses before directional circuit breaker */
+  maxConsecutiveDirectionalLosses: number;
+  /** Trailing stop activation threshold in basis points profit */
+  trailingStopActivationBps: number;
+  /** Trailing stop distance in basis points */
+  trailingStopBps: number;
+  /** HTF bias must match trade direction (bullish=long, bearish=short) */
+  requireHtfBiasMatch: boolean;
+  /** Minimum confidence from regime detector (0-1) */
+  minRegimeConfidence: number;
+  /** Cooldown period in minutes after directional breaker triggers */
+  directionalCooldownMinutes: number;
+}
+
+export const DEFAULT_DIRECTIONAL_CONFIG: DirectionalRiskConfig = {
+  positionSizePct: 20,
+  maxLeverage: 3,
+  stopLossBps: 100,       // 1%
+  takeProfitBps: 300,     // 3% (1:3 RR)
+  maxDrawdownPct: 10,
+  maxConsecutiveDirectionalLosses: 2,
+  trailingStopActivationBps: 100,  // enable trailing at 1% profit
+  trailingStopBps: 50,             // 0.5% trailing distance
+  requireHtfBiasMatch: true,
+  minRegimeConfidence: 0.3,
+  directionalCooldownMinutes: 30,  // auto-resume after 30min
+};
+
 export interface RiskConfig {
   /** Minimum net profit in USD after all costs */
   minProfitUsd: number;
@@ -78,6 +117,8 @@ export interface TradeRecord {
 
 export interface RiskState {
   consecutiveFailures: number;
+  directionalConsecutiveLosses: number;
+  directionalCooldownAt: number | null;
   circuitBreakerActive: boolean;
   circuitBreakerResumesAt: number | null;
   dailyLossUsd: number;
@@ -123,14 +164,17 @@ export class RiskManager {
   private config: RiskConfig;
   private state: RiskState;
   private blacklistedSet: Set<string>;
+  private directionalConfig: DirectionalRiskConfig;
 
   constructor(config?: Partial<RiskConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.directionalConfig = { ...DEFAULT_DIRECTIONAL_CONFIG };
     this.blacklistedSet = new Set(
       this.config.tokenBlacklist.map(normalizeAddress),
     );
     this.state = {
       consecutiveFailures: 0,
+      directionalConsecutiveLosses: 0,
       circuitBreakerActive: false,
       circuitBreakerResumesAt: null,
       dailyLossUsd: 0,
@@ -237,6 +281,67 @@ export class RiskManager {
     return {
       approved: reasons.length === 0,
       reasons,
+    };
+  }
+
+  /**
+   * Validate a trade against directional / regime-aware rules.
+   */
+  validateDirectionalTrade(side: 'long' | 'short', regime: string, confidence: number): ValidationResult {
+    const reasons: string[] = [];
+    const now = Date.now();
+
+    this.maybeResetDaily(now);
+    this.maybeAutoResumeCircuitBreaker(now);
+
+    // HTF bias must match trade direction
+    if (this.directionalConfig.requireHtfBiasMatch) {
+      if (regime === 'bullish' && side === 'short') {
+        reasons.push('Regime is bullish, cannot take short');
+      }
+      if (regime === 'bearish' && side === 'long') {
+        reasons.push('Regime is bearish, cannot take long');
+      }
+    }
+
+    // Neutral regime always fails
+    if (regime === 'neutral') {
+      reasons.push('Regime is neutral, no directional trades allowed');
+    }
+
+    // Confidence check
+    if (confidence < this.directionalConfig.minRegimeConfidence) {
+      reasons.push(`Directional confidence ${confidence.toFixed(2)} below minimum ${this.directionalConfig.minRegimeConfidence}`);
+    }
+
+    // Directional circuit breaker
+    if (this.state.directionalConsecutiveLosses >= this.directionalConfig.maxConsecutiveDirectionalLosses) {
+      reasons.push(`Directional circuit breaker active (${this.state.directionalConsecutiveLosses} consecutive directional losses)`);
+    }
+
+    // Daily loss limit
+    if (this.state.dailyLossUsd <= -this.config.dailyLossLimitUsd) {
+      reasons.push(`Daily loss limit reached ($${Math.abs(this.state.dailyLossUsd).toFixed(2)} / $${this.config.dailyLossLimitUsd})`);
+    }
+
+    return {
+      approved: reasons.length === 0,
+      reasons,
+    };
+  }
+
+  /**
+   * Check if the directional circuit breaker is active.
+   */
+  getDirectionalCircuitBreakerStatus(): CircuitBreakerStatus {
+    const active = this.state.directionalConsecutiveLosses >= this.directionalConfig.maxConsecutiveDirectionalLosses;
+    const resumesAt = active ? this.state.circuitBreakerResumesAt : null;
+    return {
+      active,
+      resumesAt,
+      reason: active
+        ? `${this.state.directionalConsecutiveLosses} consecutive directional losses (max ${this.directionalConfig.maxConsecutiveDirectionalLosses})`
+        : 'Directional circuit breaker not active',
     };
   }
 

@@ -10,3 +10,25 @@ cache/
 typechain-types/
 .coverage/
 
+
+# Agent/project-local state and secrets
+.a0proj/
+.env*
+!.env.example
+
+# Local scratch artifacts
+12,.0f}
+12,.0f})
+check-wallet.ts
+ALPHA_REPORT_*.md
+LIVE_ALPHA_REPORT_*.md
+
+# Rust build output (only committed binary is intentional)
+rust-sidecar/target/*
+!rust-sidecar/target/debug/
+rust-sidecar/target/debug/*
+!rust-sidecar/target/debug/flashloan-sidecar
+
+# no-mistakes generated agent files
+.agents/
+.claude/

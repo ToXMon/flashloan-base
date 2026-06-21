@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package flashloan.scanner.v1;
+
+// Strategy types for flash loan operations
+enum Strategy {
+  STRATEGY_UNSPECIFIED = 0;
+  TRIANGLE_ARB = 1;
+  CROSS_DEX_ARB = 2;
+  MEMECOIN = 3;
+}
+
+// DEX identifiers on Base chain
+enum Dex {
+  DEX_UNSPECIFIED = 0;
+  AERODROME_CL = 1;
+  AERODROME_AMM = 2;
+  UNISWAP_V3 = 3;
+}
+
+// Health status for the scanner service
+enum HealthStatus {
+  HEALTH_STATUS_UNSPECIFIED = 0;
+  HEALTHY = 1;
+  DEGRADED = 2;
+  UNHEALTHY = 3;
+}
+
+// Empty message (alternative to google.protobuf.Empty)
+message Empty {}
+
+// Stream request — extensible for future filtering
+message StreamRequest {}

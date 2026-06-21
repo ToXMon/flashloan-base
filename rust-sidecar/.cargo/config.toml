@@ -1,0 +1,27 @@
+[build]
+# Parallelize compilation
+jobs = -1
+
+[term]
+# Colorful output
+verbose = false
+
+[profile.dev]
+# Faster dev builds
+opt-level = 0
+debug = true
+
+[profile.release]
+# Maximum optimization
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+# Use mold linker if available for faster linking
+[target.x86_64-unknown-linux-gnu]
+linker = "gcc"
+
+[target.aarch64-unknown-linux-gnu]
+linker = "gcc"

@@ -1,0 +1,15 @@
+{
+  "rpc_url": "https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+  "ws_url": "wss://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+  "pools_config_path": "pools.toml",
+  "grpc_port": 50051,
+  "min_profit_usd": 0.10,
+  "min_spread_bps": 10,
+  "flash_loan_fee_bps": 5,
+  "max_gas_price_gwei": 1.0,
+  "scan_interval_ms": 1000,
+  "max_triangle_depth": 3,
+  "memecoin_min_volume_usd": 10000.0,
+  "memecoin_max_age_secs": 86400,
+  "log_level": "info"
+}
