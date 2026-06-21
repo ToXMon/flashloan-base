@@ -3,13 +3,13 @@ version: "2.0"
 
 services:
   rust-sidecar:
-    image: ghcr.io/toxmoN/flashloan-base-rust-sidecar:v1.0.0
+    image: ghcr.io/toxmon/flashloan-base-rust-sidecar:v1.0.0
     env:
       - "RUST_LOG=info"
       - "GRPC_BIND=0.0.0.0:50051"
-      - "BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
-      - "SIDECAR_WS_URL=wss://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
-      - "SIDECAR_RPC_URL=https://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
+      - "BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+      - "SIDECAR_WS_URL=wss://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+      - "SIDECAR_RPC_URL=https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
     expose:
       - port: 50051
         as: 50051
@@ -18,12 +18,12 @@ services:
           - service: typescript-core
 
   typescript-core:
-    image: ghcr.io/toxmoN/flashloan-base-typescript-core:v1.0.0
+    image: ghcr.io/toxmon/flashloan-base-typescript-core:v1.0.0
     env:
       - "GRPC_SIDECAR_ADDR=rust-sidecar:50051"
-      - "BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
-      - "SIDECAR_WS_URL=wss://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
-      - "SIDECAR_RPC_URL=https://base-mainnet.g.alchemy.com/v2/cEk61ALx-EF3B2OyNcajj"
+      - "BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+      - "SIDECAR_WS_URL=wss://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+      - "SIDECAR_RPC_URL=https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
       - "HEALTH_FACTOR_THRESHOLD=1.1"
       - "MAX_SLIPPAGE_BPS=50"
       - "GAS_PRICE_MULTIPLIER=1.1"
