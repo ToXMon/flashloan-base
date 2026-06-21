@@ -1,5 +1,5 @@
 # Single-stage Dockerfile using pre-compiled Rust binary
-# Binary is committed to git at rust-sidecar/target/debug/flashloan-sidecar
+# Binary is committed to git at rust-sidecar/target/release/flashloan-sidecar
 
 FROM debian:bookworm-slim
 
@@ -16,7 +16,7 @@ RUN groupadd --gid 1000 appuser && \
 WORKDIR /app
 
 # Copy pre-compiled binary from git context
-COPY rust-sidecar/target/debug/flashloan-sidecar /app/flashloan-sidecar
+COPY rust-sidecar/target/release/flashloan-sidecar /app/flashloan-sidecar
 
 # Copy config if present
 COPY rust-sidecar/config /app/config
