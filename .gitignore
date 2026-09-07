@@ -13,12 +13,11 @@ typechain-types/
 
 # Agent/project-local state and secrets
 .a0proj/
+.ase/
 .env*
 !.env.example
 
 # Local scratch artifacts
-12,.0f}
-12,.0f})
 check-wallet.ts
 ALPHA_REPORT_*.md
 LIVE_ALPHA_REPORT_*.md
